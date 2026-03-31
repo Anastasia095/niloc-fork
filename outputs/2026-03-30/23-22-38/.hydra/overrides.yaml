@@ -1,0 +1,10 @@
+- run_name=avalon_2nd_floor_syn
+- dataset=avalon_2nd_floor_syn
+- grid=avalon_2nd_floor
+- +arch/input@arch.encoder_input=tcn
+- +arch/output@arch.encoder_output=cnnfc_avalon_2nd_floor
+- +arch/input@arch.decoder_input=cnn1d_avalon_2nd_floor
+- +arch/output@arch.decoder_output=cnnfc_avalon_2nd_floor
+- data.batch_size=4
+- arch.d_model=128
+- train_cfg.scheduler.monitor=val_enc_loss

@@ -1,0 +1,2 @@
+best          epoch=255-tr_ratio=0.6-val_loss=10.22.ckpt
+final         epoch=799-tr_ratio=0.0.ckpt
