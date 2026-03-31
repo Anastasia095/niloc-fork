@@ -3,3 +3,4 @@ name: avalon_synthetic
 root_dir: ${oc.env:NILOC_DATA_ROOT}/avalon/synthetic_output
 train_list: ${dataset.root_dir}/train.txt
 val_list: ${dataset.root_dir}/val.txt
+test_list: ${dataset.root_dir}/test.txt
