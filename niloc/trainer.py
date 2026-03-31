@@ -4,6 +4,7 @@ import os.path as osp
 import sys
 import tempfile
 from typing import Tuple
+from dotenv import load_dotenv
 
 import hydra
 import numpy as np
@@ -26,6 +27,7 @@ task_models = {
     "scheduled_2branch": Scheduled2branchModule,
 }
 
+load_dotenv()
 
 def arg_conversion(cfg: DictConfig) -> None:
     """ Convert from time arguments to data size, and append to configuration """
