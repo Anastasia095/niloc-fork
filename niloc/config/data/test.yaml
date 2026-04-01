@@ -8,7 +8,7 @@ imu_freq : 10.0
 # Configuration for input data sampling
 window:
   # values in seconds
-  window_time : 20.1
+  window_time : 9.0
   # stepping in testing (Hz) (*made equal to frame sample size of arch)
   sample_freq : 1.0
 

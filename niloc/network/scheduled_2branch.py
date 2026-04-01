@@ -274,6 +274,15 @@ class Scheduled2branchModule(ScheduledSamplingModule):
 
         w, s = cfg.data_window_cfg.window_size, cfg.data_window_cfg.step_size
         overlap = int((w - self.zero - s) // self.sample)
+        if len(data_loader.dataset) == 0:
+            dataset = data_loader.dataset
+            target_lengths = [t.shape[0] for t in getattr(dataset, "targets", [])]
+            max_target_len = max(target_lengths) if target_lengths else 0
+            raise ValueError(
+                "No inference windows were created for this test sequence. "
+                f"Configured window_size={w} and step_size={s}, but the longest loaded target sequence "
+                f"has length {max_target_len}. Reduce data.window.window_time or provide longer test trajectories."
+            )
         for i, (feat, targ, _, frame_id) in enumerate(data_loader):
             if test_type == "enc":
                 pred, _ = self.network.forward_encoder(feat[:, :, self.zero:].to(self.device))
