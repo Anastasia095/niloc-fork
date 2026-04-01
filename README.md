@@ -98,15 +98,25 @@ Config lives in `preprocess/config/synthetic_data.yaml`. Output format is identi
 
 ---
 
+
 ## Evaluation
 
 ```bash
 ./test_imu.sh <building> <checkpoint_list_file>
 ```
-
 See `niloc/cmd_test_file.py` for the checkpoint list format. Outputs error CDFs, trajectory plots, and TensorBoard logs.
 
----
+To view tnesorboard evaluation run evaluation with these flags (example):
+```bash
+./test_imu.sh \
+  avalon_2nd_floor \
+  'outputs/2026-03-30/23-42-04/<path>/models/avalon_2nd_floor_syn/version_0/my_checkpoints.txt' \
+  test_cfg.test_name=my_eval \
+  test_cfg.ffmpeg_path=/usr/bin/ffmpeg
+```
+Then start TensorBoard pointing to the logs:
+
+tensorboard ```bash--logdir /home/anastasia/Desktop/Repos/niloc/outputs/2026-04-01/12-42-47/<path>/models/avalon_2nd_floor/logs```
 
 ## Adding a new building
 
