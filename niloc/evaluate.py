@@ -171,16 +171,19 @@ def compute_error(
         "dpi": cfg.grid.dpi,
     }
     cell_bounds = sequence.plot_bounds
+    y_max = cell_bounds[3]
     _max_dist = math.sqrt(cell_bounds[1] * cell_bounds[1] + cell_bounds[3] * cell_bounds[3])
 
     def plot_figure(pred, gt, error, thres, dist, title):
         figsize = (5, 15)
         fig = plt.figure(figsize=figsize)
         plt.subplot(311)
-        plt.imshow(np.flipud(map_image.T), cmap="Greys", alpha=0.5, extent=cell_bounds)
-        plt.plot(gt[:, 0], gt[:, 1], c='r')
-        plt.plot(pred[:, 0], pred[:, 1], c='grey')
-        sc = plt.scatter(pred[:, 0], pred[:, 1], c=dist, cmap='cool', vmin=0., vmax=_max_dist)  # normalize
+        plt.imshow(map_image, cmap="Greys", alpha=0.5, extent=cell_bounds, origin="upper")
+        gt_plot = np.column_stack([gt[:, 0], y_max - gt[:, 1]])
+        pred_plot = np.column_stack([pred[:, 0], y_max - pred[:, 1]])
+        plt.plot(gt_plot[:, 0], gt_plot[:, 1], c='r')
+        plt.plot(pred_plot[:, 0], pred_plot[:, 1], c='grey')
+        sc = plt.scatter(pred_plot[:, 0], pred_plot[:, 1], c=dist, cmap='cool', vmin=0., vmax=_max_dist)  # normalize
         plt.colorbar(sc)
         plt.legend(["gt", "prediction"])
         plt.title(f"mean {np.mean(dist):.2f} | auc {np.mean(error):.4f}")
@@ -246,15 +249,17 @@ def plot_full_traj_heatmap(
         img_size = sequence.grid_dim[0] * sequence.grid_dim[1]
     # cell_bounds = sequence.bounds
     cell_bounds = sequence.plot_bounds
+    y_max = cell_bounds[3]
     gt_traj = plot_dict["gt_traj"]
+    gt_traj_plot = np.column_stack([gt_traj[:, 0], y_max - gt_traj[:, 1]])
     pred, targ, idx = compute_output_for_trajectory(cfg, plot_dict, sample, zero)
 
     figsize = (4.5, 4.5)
     for i in range(len(pred)):
         fig = plt.figure(figsize=figsize)
-        plt.imshow(np.flipud(map_image.T), cmap="Greys", alpha=0.5, extent=cell_bounds)
+        plt.imshow(map_image, cmap="Greys", alpha=0.5, extent=cell_bounds, origin="upper")
         img = pred[i][:img_size]
-        img = np.flipud(img.reshape(-1, height).T)
+        img = img.reshape(-1, height).T
         if cfg.test_cfg.filter:
             img = gaussian_filter(img, cfg.test_cfg.filter)
             img /= np.max(img)
@@ -265,14 +270,15 @@ def plot_full_traj_heatmap(
             vmin=0.0,
             vmax=1.0,
             alpha=0.9,
+            origin="upper",
         )
         plt.plot(
-            gt_traj[:, 0],
-            gt_traj[:, 1],
+            gt_traj_plot[:, 0],
+            gt_traj_plot[:, 1],
             "grey",
             alpha=0.5,
         )
-        point = gt_traj[idx[i]]
+        point = gt_traj_plot[idx[i]]
         plt.scatter(
             point[0],
             point[1],
@@ -329,7 +335,9 @@ def plot_individual_heatmap(
         cell_size = sequence.cell_size if compute_original else 1.0
     # cell_bounds = sequence.bounds
     cell_bounds = sequence.plot_bounds
+    y_max = cell_bounds[3]
     start, step, w = 0, cfg.data_window_cfg.step_size, cfg.data_window_cfg.window_size
+    gt_traj_plot = np.column_stack([gt_traj[:, 0], y_max - gt_traj[:, 1]])
 
     figsize = (5, 5)
 
@@ -339,10 +347,10 @@ def plot_individual_heatmap(
         for j in range(pred.shape[1]):
             fig = plt.figure(figsize=figsize)
             plt.imshow(
-                np.flipud(map_image.T), cmap="Greys", alpha=.5, extent=cell_bounds
+                map_image, cmap="Greys", alpha=.5, extent=cell_bounds, origin="upper"
             )
             img = pred[i, j][:img_size]
-            img = np.flipud(img.reshape(-1, height).T)
+            img = img.reshape(-1, height).T
             if cfg.test_cfg.filter:
                 img = gaussian_filter(img, cfg.test_cfg.filter)
                 img /= np.max(img)
@@ -353,18 +361,19 @@ def plot_individual_heatmap(
                 vmin=0.0,
                 vmax=1.0,
                 alpha=0.9,
+                origin="upper",
             )
             p = idx[i]
             plt.plot(
-                gt_traj[p: p + w, 0],
-                gt_traj[p: p + w, 1],
+                gt_traj_plot[p: p + w, 0],
+                gt_traj_plot[p: p + w, 1],
                 "grey",
                 alpha=0.9,
             )
             t = targ[i, j]
             plt.scatter(
                 (t // height) * cell_size,
-                (t % height) * cell_size,
+                y_max - (t % height) * cell_size,
                 marker="x",
                 s=30,
                 c="b",
