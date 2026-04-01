@@ -153,6 +153,10 @@ def launch_astar(
                 traj[:, 1] = x * np.sin(-angle_pi) + y * np.cos(-angle_pi) + sh_orig[1] / 2
 
             smoothed_traj = traj_cls.smooth_trajectory(traj)
+            # A* and smoothing operate in image-index order [row, col].
+            # Convert to the dataset convention [x, y] = [col, row] before saving.
+            smoothed_traj[:, [1, 2]] = smoothed_traj[:, [2, 1]]
+            smoothed_traj[:, [3, 4]] = smoothed_traj[:, [4, 3]]
             np.savetxt(
                 osp.join(cfg.folder, f"{floorplan_name}_{file_tag}_agent{i}.txt"),
                 smoothed_traj,
